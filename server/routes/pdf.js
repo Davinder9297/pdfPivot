@@ -15,7 +15,7 @@ const PptxGenJS = require('pptxgenjs');
 const upload = multer({ dest: 'uploads/' });
 const XLSX = require('xlsx');
 const pdfParse = require('pdf-parse');
-
+const PDFParser = require('pdf2json');
 // Set LibreOffice path for Windows
 const uploadDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadDir)) {
@@ -1002,5 +1002,93 @@ router.post('/word-to-pdf', upload.single('document'), (req, res) => {
   });
 });
 
+router.post('/pdf-to-text', upload.single('pdf'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No PDF file uploaded' });
+    }
 
+    // Read the uploaded file as Buffer
+    const pdfBuffer = fs.readFileSync(req.file.path);
+
+    // Parse the PDF buffer to extract text
+    const data = await pdfParse(pdfBuffer);
+
+    // Cleanup the uploaded file
+    fs.unlinkSync(req.file.path);
+
+    // Send extracted text as plain text response
+    res.setHeader('Content-Disposition', 'attachment; filename=converted.txt');
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(data.text);
+
+  } catch (error) {
+    console.error('PDF to text conversion error:', error);
+    res.status(500).json({ error: 'Failed to convert PDF to text' });
+  }
+});
+router.post('/update-metadata', upload.single('pdf'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No PDF uploaded' });
+
+    const pdfBuffer = fs.readFileSync(req.file.path);
+    const pdfDoc = await PDFDocument.load(pdfBuffer);
+
+    // Update metadata
+    if (req.body.title) pdfDoc.setTitle(req.body.title);
+    if (req.body.author) pdfDoc.setAuthor(req.body.author);
+    if (req.body.subject) pdfDoc.setSubject(req.body.subject);
+    if (req.body.keywords) {
+      const keywords = req.body.keywords.split(',').map(k => k.trim());
+      pdfDoc.setKeywords(keywords);
+    }
+
+    const updatedPdfBytes = await pdfDoc.save();
+
+    // Clean up uploaded file
+    fs.unlinkSync(req.file.path);
+
+    // Set correct headers
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="updated.pdf"',
+      'Content-Length': updatedPdfBytes.length,
+    });
+
+    return res.end(updatedPdfBytes);
+  } catch (error) {
+    console.error('Error updating PDF metadata:', error);
+    res.status(500).json({ error: 'Failed to update PDF metadata' });
+  }
+});
+router.post('/view-metadata', upload.single('pdf'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No PDF file uploaded.' });
+  }
+
+  try {
+    const pdfBytes = fs.readFileSync(req.file.path);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+
+    const metadata = pdfDoc.getTitle() || pdfDoc.getAuthor() || pdfDoc.getSubject() || pdfDoc.getKeywords()
+      ? {
+          title: pdfDoc.getTitle(),
+          author: pdfDoc.getAuthor(),
+          subject: pdfDoc.getSubject(),
+          keywords: pdfDoc.getKeywords(),
+          creator: pdfDoc.getCreator(),
+          producer: pdfDoc.getProducer(),
+          creationDate: pdfDoc.getCreationDate(),
+          modificationDate: pdfDoc.getModificationDate(),
+        }
+      : { message: 'No metadata found in this PDF.' };
+
+    res.json({ metadata });
+  } catch (error) {
+    console.error('Error extracting metadata:', error);
+    res.status(500).json({ error: 'Failed to extract metadata.' });
+  } finally {
+    fs.unlinkSync(req.file.path); // Clean up the uploaded file
+  }
+});
 module.exports = router;

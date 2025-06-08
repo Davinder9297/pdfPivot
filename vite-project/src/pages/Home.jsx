@@ -26,23 +26,22 @@ const Home = () => {
     { title: "PDF to PowerPoint", description: "Convert PDFs to PowerPoint presentations.", route: "/pdf-to-ppt", icon: "📊" },
     { title: "PDF to Excel", description: "Convert PDFs to Excel spreadsheets.", route: "/pdf-to-excel", icon: "📈" },
     { title: "PDF to PDF/A", description: "Convert PDFs to PDF/A for archiving.", route: "/pdf-to-pdfa", icon: "🗄️" },
+    { title: "PDF Metadata Viewer", description: "View all properties and details of any PDF.", route: "/view-metadata", icon: "📑" },
     { title: "Add Page Numbers", description: "Add page numbers to your PDF.", route: "/add-page-numbers", icon: "🔢" },
     { title: "Add Watermark", description: "Add watermark text or image to your PDF.", route: "/add-watermark", icon: "💧" },
     { title: "Unlock PDF", description: "Remove password protection from PDFs.", route: "/unlock-pdf", icon: "🔓" },
     { title: "Protect PDF", description: "Add password protection to your PDFs.", route: "/protect-pdf", icon: "🔒" },
-    { title: "Sign PDF", description: "Sign your PDF documents digitally.", route: "/sign-pdf", icon: "✍️" },
     { title: "Compare PDF", description: "Compare two PDF files for differences.", route: "/compare-pdf", icon: "🆚" },
+    { title: "PDF to Text Converter", description: "Extract plain text easily", route: "/pdf-to-text", icon: "📄" },
+    { title: "Update PDF Metadata", description: "Edit PDF author, title, and more", route: "/update-metadata", icon: "✏️" },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="py-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-center text-forest mb-1 px-4">
+        <h2 className="text-2xl md:text-3xl font-bold text-center text-forest mb-10 px-4">
           Everything You Need to Work with PDFs — All in One Place
         </h2>
-        <p className="text-center text-gray-700 mb-2 text-base px-4">
-          Convert, compress, merge, and edit your PDF files online — quickly, securely, and without any hassle. Whether you're organizing documents, reducing file size, or converting formats, our all-in-one PDF toolkit makes it easy.
-        </p>
         {/* Cards */}
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-[8px] gap-y-[8px] justify-start items-stretch">

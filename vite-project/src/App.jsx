@@ -37,6 +37,10 @@ import PdfToPdfaPage from "./pages/PdfToPdfA";
 import PdfProtectionPage from "./pages/Protectedpdf";
 import PdfComparePage from "./pages/CompareTwoPdf";
 import PdfWatermarkPage from "./pages/WatermarkPdf";
+import PdfRedactionPage from "./pages/PdfRedactionPage";
+import PdfToTextPage from "./pages/PdfToText";
+import UpdateMetadataPage from "./pages/UpdateMetaData";
+import PdfMetadataViewer from "./pages/MetaDataViewer";
 
 function App() {
   return (
@@ -99,6 +103,10 @@ function App() {
               <Route path="/protect-pdf" element={<PdfProtectionPage />} />
               <Route path="/compare-pdf" element={<PdfComparePage />} />
               <Route path="/add-watermark" element={<PdfWatermarkPage />} />
+              <Route path="/pdf-redaction" element={<PdfRedactionPage />} />
+              <Route path="/pdf-to-text" element={<PdfToTextPage />} />
+              <Route path="/update-metadata" element={<UpdateMetadataPage />} />
+              <Route path="/view-metadata" element={<PdfMetadataViewer />} />
             </Routes>
           </main>
           <Footer />

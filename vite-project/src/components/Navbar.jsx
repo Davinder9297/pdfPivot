@@ -1,6 +1,8 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
+import { SiTiktok } from 'react-icons/si';
+import { FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -15,7 +17,9 @@ const Navbar = () => {
   };
 
   const isActive = (path) => {
-    return location.pathname === path ? 'border-teal-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700';
+    return location.pathname === path
+      ? 'border-teal-500 text-gray-900'
+      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700';
   };
 
   const toggleMenu = () => {
@@ -61,7 +65,6 @@ const Navbar = () => {
             {/* Desktop Navigation */}
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               {user?.isAdmin ? (
-                // Admin Navigation
                 <>
                   <Link
                     to="/admin"
@@ -83,20 +86,7 @@ const Navbar = () => {
                   </Link>
                 </>
               ) : (
-                // Regular User Navigation
                 <>
-                  <Link
-                    to="/convert"
-                    className={`${isActive('/convert')} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200 text-white hover:text-green-400`}
-                  >
-                    Convert
-                  </Link>
-                  <Link
-                    to="/compress"
-                    className={`${isActive('/compress')} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200 text-white hover:text-green-400`}
-                  >
-                    Compress
-                  </Link>
                   {/* Features Dropdown */}
                   <div
                     className="relative inline-flex items-center"
@@ -105,7 +95,9 @@ const Navbar = () => {
                   >
                     <button
                       className={`hover:text-green-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200 ${
-                        showFeatures ? 'border-gold text-gold' : 'border-transparent text-white hover:border-gold hover:text-green-400'
+                        showFeatures
+                          ? 'border-gold text-gold'
+                          : 'border-transparent text-white hover:border-gold hover:text-green-400'
                       }`}
                     >
                       Features
@@ -124,7 +116,6 @@ const Navbar = () => {
                         />
                       </svg>
                     </button>
-                    {/* Features Dropdown Menu */}
                     {showFeatures && (
                       <div className="absolute z-10 top-full right-0 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                         <div className="py-2 max-h-[400px] overflow-y-auto">
@@ -146,8 +137,9 @@ const Navbar = () => {
               )}
             </div>
           </div>
-          {/* Desktop Auth Buttons */}
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
+          {/* Desktop Auth Buttons and Social Media */}
+          <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
+
             {user ? (
               <div className="flex items-center space-x-4">
                 {!user.isAdmin && (
@@ -189,6 +181,20 @@ const Navbar = () => {
                 </Link>
               </div>
             )}
+                        <div className="flex space-x-4">
+              <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-green-400">
+                <SiTiktok size={20} />
+              </a>
+              <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-green-400">
+                <FaInstagram size={20} />
+              </a>
+              <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-green-400">
+                <FaFacebook size={20} />
+              </a>
+              <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-green-400">
+                <FaYoutube size={20} />
+              </a>
+            </div>
           </div>
           {/* Mobile menu button */}
           <div className="flex items-center sm:hidden">
@@ -215,40 +221,23 @@ const Navbar = () => {
       <div className={`${isOpen ? 'block' : 'hidden'} sm:hidden`}>
         <div className="pt-2 pb-3 space-y-1">
           {user?.isAdmin ? (
-            // Admin Mobile Navigation
             <>
-              <Link
-                to="/admin"
-                className={`${isActive('/admin')} block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200`}
-              >
+              <Link to="/admin" className={`${isActive('/admin')} block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200`}>
                 Dashboard
               </Link>
-              <Link
-                to="/admin/users"
-                className={`${isActive('/admin/users')} block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200`}
-              >
+              <Link to="/admin/users" className={`${isActive('/admin/users')} block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200`}>
                 Users
               </Link>
-              <Link
-                to="/admin/plans"
-                className={`${isActive('/admin/plans')} block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200`}
-              >
+              <Link to="/admin/plans" className={`${isActive('/admin/plans')} block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200`}>
                 Plans
               </Link>
             </>
           ) : (
-            // Regular User Mobile Navigation
             <>
-              <Link
-                to="/convert"
-                className={`${isActive('/convert')} block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200`}
-              >
+              <Link to="/convert" className={`${isActive('/convert')} block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200`}>
                 Convert
               </Link>
-              <Link
-                to="/compress"
-                className={`${isActive('/compress')} block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200`}
-              >
+              <Link to="/compress" className={`${isActive('/compress')} block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200`}>
                 Compress
               </Link>
             </>
@@ -259,16 +248,10 @@ const Navbar = () => {
             <div className="space-y-1">
               {!user.isAdmin && (
                 <>
-                  <Link
-                    to="/plans"
-                    className={`${isActive('/plans')} block pl-3 pr-4 py-2 text-base font-medium transition-colors duration-200`}
-                  >
+                  <Link to="/plans" className={`${isActive('/plans')} block pl-3 pr-4 py-2 text-base font-medium transition-colors duration-200`}>
                     Plans
                   </Link>
-                  <Link
-                    to="/dashboard"
-                    className={`${isActive('/dashboard')} block pl-3 pr-4 py-2 text-base font-medium transition-colors duration-200`}
-                  >
+                  <Link to="/dashboard" className={`${isActive('/dashboard')} block pl-3 pr-4 py-2 text-base font-medium transition-colors duration-200`}>
                     Dashboard
                   </Link>
                 </>
