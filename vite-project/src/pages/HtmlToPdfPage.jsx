@@ -13,7 +13,7 @@ const HtmlToPdfPage = () => {
     }
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/html-to-pdf", {
+      const response = await fetch("/api/html-to-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ html, fileName }),

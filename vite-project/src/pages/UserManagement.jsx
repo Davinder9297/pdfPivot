@@ -13,7 +13,7 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/admin/users');
+      const response = await axios.get('/api/admin/users');
       setUsers(response.data);
       setLoading(false);
     } catch (err) {

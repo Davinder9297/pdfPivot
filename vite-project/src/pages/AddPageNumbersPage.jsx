@@ -53,7 +53,7 @@ const AddPageNumbersPage = () => {
     });
 
     try {
-      const response = await fetch('http://localhost:5000/api/add-page-numbers', {
+      const response = await fetch('/api/add-page-numbers', {
         method: 'POST',
         body: formData,
       });

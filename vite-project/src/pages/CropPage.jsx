@@ -48,7 +48,7 @@ const CropPage = () => {
           throw new Error('No authentication token found');
         }
 
-        await axios.post('http://localhost:5000/api/user/track', {
+        await axios.post('/api/user/track', {
           service: 'modify-crop',
           imageCount: 1
         }, {

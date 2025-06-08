@@ -38,7 +38,7 @@ const CompressPdfPage = () => {
 
     try {
       console.log('Sending request to server...');
-      const response = await fetch('http://localhost:5000/api/pdf/compress', {
+      const response = await fetch('/api/pdf/compress', {
         method: 'POST',
         body: formData,
       });

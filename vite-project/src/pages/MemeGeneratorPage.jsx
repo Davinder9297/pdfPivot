@@ -70,7 +70,7 @@ const MemeGeneratorPage = () => {
           throw new Error('No authentication token found');
         }
 
-        await axios.post('http://localhost:5000/api/user/track', {
+        await axios.post('/api/user/track', {
           service: 'create-meme',
           imageCount: 1
         }, {

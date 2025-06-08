@@ -26,7 +26,7 @@ const UpscalePage = () => {
 
       try {
         // Check quota first
-        await axios.post('http://localhost:5000/api/user/track', {
+        await axios.post('/api/user/track', {
           service: 'optimize-upscale',
           imageCount: 1
         }, {
@@ -85,7 +85,7 @@ const UpscalePage = () => {
         return;
       }
 
-      await axios.post('http://localhost:5000/api/user/track', {
+      await axios.post('/api/user/track', {
         service: 'optimize-upscale',
         imageCount: 1
       }, {

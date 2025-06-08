@@ -37,7 +37,7 @@ const PptToPdfPage = () => {
 
     try {
       console.log('Sending request to server...');
-      const response = await fetch('http://localhost:5000/api/ppt-to-pdf', {
+      const response = await fetch('/api/ppt-to-pdf', {
         method: 'POST',
         body: formData,
       });

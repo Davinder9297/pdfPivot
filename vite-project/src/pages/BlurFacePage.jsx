@@ -68,7 +68,7 @@ const BlurFacePage = () => {
 
     try {
       // Check quota first
-      const trackRes = await axios.post('http://localhost:5000/api/user/track', {
+      const trackRes = await axios.post('/api/user/track', {
         service: 'security-blur-face',
         imageCount: 1
       }, {

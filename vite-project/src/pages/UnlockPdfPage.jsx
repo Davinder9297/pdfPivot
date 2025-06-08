@@ -48,7 +48,7 @@ const UnlockPdfPage = () => {
     formData.append('password', password);
 
     try {
-      const response = await fetch('http://localhost:5000/api/unlock-pdf', {
+      const response = await fetch('/api/unlock-pdf', {
         method: 'POST',
         body: formData
       });

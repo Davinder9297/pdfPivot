@@ -35,7 +35,7 @@ const PdfToExcelPage = () => {
     formData.append('pdf', file);
 
     try {
-      const response = await fetch('http://localhost:5000/api/pdf-to-excel', {
+      const response = await fetch('/api/pdf-to-excel', {
         method: 'POST',
         body: formData,
       });

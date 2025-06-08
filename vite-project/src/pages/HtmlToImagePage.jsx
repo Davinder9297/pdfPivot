@@ -27,7 +27,7 @@ const HtmlToImagePage = () => {
       }
 
       // Track usage first
-      await axios.post('http://localhost:5000/api/user/track', {
+      await axios.post('/api/user/track', {
         service: 'convert-html-to-image',
         imageCount: 1
       }, {
@@ -38,7 +38,7 @@ const HtmlToImagePage = () => {
       });
 
       // Generate image
-      const res = await axios.post("http://localhost:5000/api/html-to-image", 
+      const res = await axios.post("/api/html-to-image", 
         { html }, 
         { 
           responseType: "blob",

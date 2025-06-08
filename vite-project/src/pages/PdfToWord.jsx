@@ -35,7 +35,7 @@ const PdfToWordPage = () => {
 
     try {
       console.log('Sending request to server...');
-      const response = await fetch('http://localhost:5000/api/pdf-to-word', {
+      const response = await fetch('/api/pdf-to-word', {
         method: 'POST',
         body: formData,
       });

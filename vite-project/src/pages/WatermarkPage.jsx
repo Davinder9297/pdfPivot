@@ -150,7 +150,7 @@ const WatermarkPage = () => {
           throw new Error('No authentication token found');
         }
 
-        await axios.post('http://localhost:5000/api/user/track', {
+        await axios.post('/api/user/track', {
           service: 'security-watermark',
           imageCount: 1
         }, {

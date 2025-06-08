@@ -37,7 +37,7 @@ const ExcelToPdfPage = () => {
 
     try {
       console.log('Sending request to server...');
-      const response = await fetch('http://localhost:5000/api/excel-to-pdf', {
+      const response = await fetch('/api/excel-to-pdf', {
         method: 'POST',
         body: formData,
       });

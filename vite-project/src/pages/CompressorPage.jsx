@@ -77,7 +77,7 @@ const CompressorPage = () => {
 
     try {
       // Check quota first
-      const trackRes = await axios.post('http://localhost:5000/api/user/track', {
+      const trackRes = await axios.post('/api/user/track', {
         service: 'optimize-compress',
         imageCount: 1
       }, {

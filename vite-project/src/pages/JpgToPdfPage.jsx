@@ -38,7 +38,7 @@ const JpgToPdfPage = () => {
 
     try {
       console.log('Sending request to server...');
-      const response = await fetch('http://localhost:5000/api/jpg-to-pdf', {
+      const response = await fetch('/api/jpg-to-pdf', {
         method: 'POST',
         body: formData,
       });

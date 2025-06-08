@@ -34,7 +34,7 @@ const PdfToPdfaPage = () => {
     formData.append('pdf', file);
 
     try {
-      const response = await fetch('http://localhost:5000/api/pdf-to-pdfa', {
+      const response = await fetch('/api/pdf-to-pdfa', {
         method: 'POST',
         body: formData,
       });
