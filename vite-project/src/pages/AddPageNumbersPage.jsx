@@ -53,7 +53,7 @@ const AddPageNumbersPage = () => {
     });
 
     try {
-      const response = await fetch('/api/add-page-numbers', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/add-page-numbers', {
         method: 'POST',
         body: formData,
       });

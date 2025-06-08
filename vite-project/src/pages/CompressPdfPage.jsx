@@ -38,7 +38,7 @@ const CompressPdfPage = () => {
 
     try {
       console.log('Sending request to server...');
-      const response = await fetch('/api/pdf/compress', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/pdf/compress', {
         method: 'POST',
         body: formData,
       });

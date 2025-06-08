@@ -36,7 +36,7 @@ const PdfToPptPage = () => {
 
     try {
       console.log('Sending request to server...');
-      const response = await fetch('/api/pdf-to-ppt', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/pdf-to-ppt', {
         method: 'POST',
         body: formData,
       });

@@ -963,4 +963,44 @@ router.post('/protect-pdf', upload.single('pdf'), (req, res) => {
     });
   });
 });
+router.post('/word-to-pdf', upload.single('document'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  const inputPath = req.file.path;
+  const outputPath = inputPath + '.pdf';
+
+  // Read the Word file
+  const fileBuffer = fs.readFileSync(inputPath);
+
+  // Convert to PDF (output format: pdf)
+  libre.convert(fileBuffer, '.pdf', undefined, (err, done) => {
+    // Delete the uploaded docx file after conversion
+    fs.unlinkSync(inputPath);
+
+    if (err) {
+      console.error(`Error converting file: ${err}`);
+      return res.status(500).json({ error: 'Conversion failed' });
+    }
+
+    // Save converted PDF temporarily
+    fs.writeFileSync(outputPath, done);
+
+    // Send the PDF file to client
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${path.parse(req.file.originalname).name}.pdf"`);
+
+    // Read PDF and pipe to response
+    const pdfStream = fs.createReadStream(outputPath);
+    pdfStream.pipe(res);
+
+    // Delete the temporary PDF file after sending response
+    pdfStream.on('close', () => {
+      fs.unlinkSync(outputPath);
+    });
+  });
+});
+
+
 module.exports = router;

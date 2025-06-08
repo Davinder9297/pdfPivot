@@ -35,7 +35,7 @@ const PdfProtectionPage = () => {
     formData.append('password', password);
 
     try {
-      const response = await fetch('/api/protect-pdf', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/protect-pdf', {
         method: 'POST',
         body: formData,
       });

@@ -36,7 +36,7 @@ export default function PdfComparePage() {
     formData.append('file2', files[1]);
 
     try {
-      const response = await fetch('/api/compare-pdf', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/compare-pdf', {
         method: 'POST',
         body: formData,
       });

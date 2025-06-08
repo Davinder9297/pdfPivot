@@ -35,7 +35,7 @@ const PdfToWordPage = () => {
 
     try {
       console.log('Sending request to server...');
-      const response = await fetch('/api/pdf-to-word', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/pdf-to-word', {
         method: 'POST',
         body: formData,
       });

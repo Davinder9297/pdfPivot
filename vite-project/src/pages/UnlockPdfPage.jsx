@@ -48,7 +48,7 @@ const UnlockPdfPage = () => {
     formData.append('password', password);
 
     try {
-      const response = await fetch('/api/unlock-pdf', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/unlock-pdf', {
         method: 'POST',
         body: formData
       });

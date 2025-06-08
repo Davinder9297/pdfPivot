@@ -48,7 +48,7 @@ const MergePdfPage = () => {
     files.forEach(file => formData.append('pdfs', file));
 
     try {
-      const response = await fetch('/api/merge-pdf', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/merge-pdf', {
         method: 'POST',
         body: formData,
       });

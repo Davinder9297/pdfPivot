@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FaFileWord, FaFilePdf, FaDownload } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';  // <-- import axios
 
 const WordToPdfPage = () => {
   const [file, setFile] = useState(null);
@@ -37,22 +38,19 @@ const WordToPdfPage = () => {
 
     try {
       console.log('Sending request to server...');
-      const response = await fetch('/api/word-to-pdf', {
-        method: 'POST',
-        body: formData,
+      const response = await axios.post('/api/word-to-pdf', formData, {
+        responseType: 'blob',  // Important to get file blob
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server error: ${response.status}`);
-      }
-
-      const blob = await response.blob();
-      setConvertedFile(blob);
+      setConvertedFile(response.data);
       toast.success('Document converted to PDF successfully!');
     } catch (error) {
       console.error('Conversion error:', error);
-      setError(error.message || 'Failed to convert document. Please make sure the server is running.');
+      const message = error.response?.data?.error || error.message || 'Failed to convert document. Please make sure the server is running.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -181,4 +179,4 @@ const WordToPdfPage = () => {
   );
 };
 
-export default WordToPdfPage; 
+export default WordToPdfPage;

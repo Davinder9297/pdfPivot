@@ -24,7 +24,7 @@ const SplitPdfPage = () => {
     const formData = new FormData();
     formData.append('pdf', file);
     try {
-      const response = await fetch('/api/split-pdf', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/split-pdf', {
         method: 'POST',
         body: formData,
       });

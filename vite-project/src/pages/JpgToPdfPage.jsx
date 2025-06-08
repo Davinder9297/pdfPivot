@@ -38,7 +38,7 @@ const JpgToPdfPage = () => {
 
     try {
       console.log('Sending request to server...');
-      const response = await fetch('/api/jpg-to-pdf', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/jpg-to-pdf', {
         method: 'POST',
         body: formData,
       });

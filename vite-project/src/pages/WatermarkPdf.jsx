@@ -42,7 +42,7 @@ const PdfWatermarkPage = () => {
     formData.append('watermark', watermarkText);
 
     try {
-      const response = await fetch('/api/pdf-watermark', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/pdf-watermark', {
         method: 'POST',
         body: formData,
       });
