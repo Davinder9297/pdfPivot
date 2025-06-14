@@ -3,6 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import { FaFilePdf, FaHashtag } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import OperationTabsWrapper from '../components/TabWrapper';
 
 const AddPageNumbersPage = () => {
   const [file, setFile] = useState(null);
@@ -111,7 +112,7 @@ const AddPageNumbersPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+<div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-forest mb-2">Add Page Numbers to PDF</h1>

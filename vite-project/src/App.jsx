@@ -44,6 +44,7 @@ import PdfMetadataViewer from "./pages/MetaDataViewer";
 import PaymentFailedPage from "./pages/PaymentFailed";
 import PaymentSuccessPage from "./pages/PaymentSuccess";
 import SubscribePage from "./pages/SubscribePage";
+import OperationTabsWrapper from "./components/TabWrapper";
 
 function App() {
   return (
@@ -87,32 +88,32 @@ function App() {
               } />
 
               <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/merge-pdf" element={<MergePdfPage />} />
-              <Route path="/split-pdf" element={<SplitPdfPage />} />
-              <Route path="/remove-pages" element={<RemovePdfPage />} />
-              <Route path="/extract-pages" element={<ExtractPdfPage />} />
-              <Route path="/rotate-pdf" element={<RotatePdfPage />} />
-              <Route path="/compress-pdf" element={<CompressPdfPage />} />
-              <Route path="/jpg-to-pdf" element={<JpgToPdfPage />} />
-              <Route path="/word-to-pdf" element={<WordToPdfPage />} />
-              <Route path="/pdf-to-jpg" element={<PdfToJpgPage />} />
-              <Route path="/add-page-numbers" element={<AddPageNumbersPage />} />
-              <Route path="/unlock-pdf" element={<UnlockPdfPage />} />
-              <Route path="/html-to-pdf" element={<HtmlToPdfPage />} />
-              <Route path="/organize-pdf" element={<OrganizePdfPage />} />
-              <Route path="/ppt-to-pdf" element={<PptToPdfPage />} />
-              <Route path="/excel-to-pdf" element={<ExcelToPdfPage />} />
-              <Route path="/pdf-to-word" element={<PdfToWordPage />} />
-              <Route path="/pdf-to-ppt" element={<PdfToPptPage />} />
-              <Route path="/pdf-to-excel" element={<PdfToExcelPage />} />
-              <Route path="/pdf-to-pdfa" element={<PdfToPdfaPage />} />
-              <Route path="/protect-pdf" element={<PdfProtectionPage />} />
-              <Route path="/compare-pdf" element={<PdfComparePage />} />
-              <Route path="/add-watermark" element={<PdfWatermarkPage />} />
-              <Route path="/pdf-redaction" element={<PdfRedactionPage />} />
-              <Route path="/pdf-to-text" element={<PdfToTextPage />} />
-              <Route path="/update-metadata" element={<UpdateMetadataPage />} />
-              <Route path="/view-metadata" element={<PdfMetadataViewer />} />
+              <Route path="/merge-pdf" element={<OperationTabsWrapper><MergePdfPage /></OperationTabsWrapper>} />
+              <Route path="/split-pdf" element={<OperationTabsWrapper><SplitPdfPage /></OperationTabsWrapper>} />
+              <Route path="/remove-pages" element={<OperationTabsWrapper><RemovePdfPage /></OperationTabsWrapper>} />
+              <Route path="/extract-pages" element={<OperationTabsWrapper><ExtractPdfPage /></OperationTabsWrapper>} />
+              <Route path="/rotate-pdf" element={<OperationTabsWrapper><RotatePdfPage /></OperationTabsWrapper>} />
+              <Route path="/compress-pdf" element={<OperationTabsWrapper><CompressPdfPage /></OperationTabsWrapper>} />
+              <Route path="/jpg-to-pdf" element={<OperationTabsWrapper><JpgToPdfPage /></OperationTabsWrapper>} />
+              <Route path="/word-to-pdf" element={<OperationTabsWrapper><WordToPdfPage /></OperationTabsWrapper>} />
+              <Route path="/pdf-to-jpg" element={<OperationTabsWrapper><PdfToJpgPage /></OperationTabsWrapper>} />
+              <Route path="/add-page-numbers" element={<OperationTabsWrapper><AddPageNumbersPage /></OperationTabsWrapper>} />
+              <Route path="/unlock-pdf" element={<OperationTabsWrapper><UnlockPdfPage /></OperationTabsWrapper>} />
+              <Route path="/html-to-pdf" element={<OperationTabsWrapper><HtmlToPdfPage /></OperationTabsWrapper>} />
+              <Route path="/organize-pdf" element={<OperationTabsWrapper><OrganizePdfPage /></OperationTabsWrapper>} />
+              <Route path="/ppt-to-pdf" element={<OperationTabsWrapper><PptToPdfPage /></OperationTabsWrapper>} />
+              <Route path="/excel-to-pdf" element={<OperationTabsWrapper><ExcelToPdfPage /></OperationTabsWrapper>} />
+              <Route path="/pdf-to-word" element={<OperationTabsWrapper><PdfToWordPage /></OperationTabsWrapper>} />
+              <Route path="/pdf-to-ppt" element={<OperationTabsWrapper><PdfToPptPage /></OperationTabsWrapper>} />
+              <Route path="/pdf-to-excel" element={<OperationTabsWrapper><PdfToExcelPage /></OperationTabsWrapper>} />
+              <Route path="/pdf-to-pdfa" element={<OperationTabsWrapper><PdfToPdfaPage /></OperationTabsWrapper>} />
+              <Route path="/protect-pdf" element={<OperationTabsWrapper><PdfProtectionPage /></OperationTabsWrapper>} />
+              <Route path="/compare-pdf" element={<OperationTabsWrapper><PdfComparePage /></OperationTabsWrapper>} />
+              <Route path="/add-watermark" element={<OperationTabsWrapper><PdfWatermarkPage /></OperationTabsWrapper>} />
+              <Route path="/pdf-redaction" element={<OperationTabsWrapper><PdfRedactionPage /></OperationTabsWrapper>} />
+              <Route path="/pdf-to-text" element={<OperationTabsWrapper><PdfToTextPage /></OperationTabsWrapper>} />
+              <Route path="/update-metadata" element={<OperationTabsWrapper><UpdateMetadataPage /></OperationTabsWrapper>} />
+              <Route path="/view-metadata" element={<OperationTabsWrapper><PdfMetadataViewer /></OperationTabsWrapper>} />
             </Routes>
           </main>
           <Footer />

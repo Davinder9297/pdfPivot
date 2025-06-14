@@ -183,7 +183,6 @@ const SubscriptionPlans = () => {
               ))}
             </div>
 
-            {currentPlan?._id !== plan._id && (
               <div className="mt-auto pt-6">
                 <button
                   onClick={() => handleSubscribe(plan._id)}
@@ -192,21 +191,9 @@ const SubscriptionPlans = () => {
                   {plan.monthlyFee === 0 ? "Start Free" : "Select Plan"}
                 </button>
               </div>
-            )}
           </div>
         ))}
       </div>
-
-      {currentPlan && (
-        <div className="mt-8 text-center">
-          <button
-            onClick={handleCancelSubscription}
-            className="text-sm text-red-600 hover:text-red-800"
-          >
-            Cancel Subscription
-          </button>
-        </div>
-      )}
     </div>
   );
 };

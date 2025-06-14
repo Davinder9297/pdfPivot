@@ -6,7 +6,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [activeCategory, setActiveCategory] = useState('PDF Page Management')
   useEffect(() => {
     // Check for token in localStorage
     const token = localStorage.getItem('token');
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, setUser, login, register, logout, loading ,activeCategory,setActiveCategory}}>
       {children}
     </AuthContext.Provider>
   );
