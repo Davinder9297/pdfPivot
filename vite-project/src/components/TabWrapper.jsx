@@ -23,17 +23,17 @@ const handleClick=(cat)=>{
   return (
     <div className='py-8'>
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 border-2 border-forest max-w-7xl mx-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-7xl mx-auto">
         {/* Tabs */}
-        <div className="flex flex-wrap justify-center gap-3 px-4 mb-6">
+        <div className="flex flex-wrap justify-start  mb-10">
           {Object.keys(categories).map((cat) => (
             <button
               key={cat}
               onClick={() => handleClick(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium border ${
-                activeCategory === cat
-                  ? "bg-forest text-white border-forest"
-                  : "bg-white text-forest border-gray-300 hover:bg-forest hover:text-white"
+              className={`px-4 py-4  text-sm font-semibold  ${
+                activeCategory !== cat
+                  ? "bg-[#008080] text-white border border-gray-300"
+                  : "bg-white text-[#008080] "
               } transition duration-200`}
             >
               {cat}
