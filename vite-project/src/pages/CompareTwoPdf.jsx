@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FaFilePdf, FaDownload } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 export default function PdfComparePage() {
   const [files, setFiles] = useState([]);
@@ -34,8 +35,23 @@ export default function PdfComparePage() {
     const formData = new FormData();
     formData.append('file1', files[0]);
     formData.append('file2', files[1]);
-
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+         const trackRes = await axios.post('/api/user/track', {
+        service: 'compare-pdf',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/compare-pdf', {
         method: 'POST',
         body: formData,
@@ -50,8 +66,14 @@ export default function PdfComparePage() {
       setDiffPdf(blob);
       toast.success('Comparison done!');
     } catch (err) {
-      console.error(err);
-      setError(err.message || 'Failed to compare PDFs.');
+     console.error("Comparison failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to compare pdf. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

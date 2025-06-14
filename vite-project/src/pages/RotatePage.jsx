@@ -93,7 +93,7 @@ const RotatePage = () => {
         }
 
         await axios.post('/api/user/track', {
-          service: 'modify-rotate',
+          service: 'rotate-pdf',
           imageCount: 1
         }, {
           headers: {

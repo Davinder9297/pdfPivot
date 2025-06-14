@@ -16,6 +16,30 @@ const subscriptionSchema = new mongoose.Schema({
     enum: ['active', 'cancelled', 'expired'],
     default: 'active'
   },
+  billingType: {
+    type: String,
+    enum: ['monthly', 'annual'],
+    required: true
+  },
+  amountPaid: {
+    type: Number,
+    required: true
+  },
+  currency: {
+    type: String,
+    default: 'usd'
+  },
+  chargeId: {
+    type: String,
+    required: true
+  },
+  paymentStatus: {
+    type: String,
+    required: true
+  },
+  paymentMethod: {
+    type: String
+  },
   startDate: {
     type: Date,
     default: Date.now
@@ -28,4 +52,4 @@ const subscriptionSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Subscription', subscriptionSchema); 
+module.exports = mongoose.model('Subscription', subscriptionSchema);

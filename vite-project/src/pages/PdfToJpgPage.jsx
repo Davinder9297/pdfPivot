@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import axios from 'axios';
 
 GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 
@@ -20,8 +21,23 @@ const PdfToJpgPage = () => {
     setError(null);
     setImages([]);
     setLoading(true);
-
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+         const trackRes = await axios.post('/api/user/track', {
+        service: 'pdf-to-jpg',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await getDocument({ data: arrayBuffer }).promise;
       const imgArray = [];
@@ -43,8 +59,14 @@ const PdfToJpgPage = () => {
 
       setImages(imgArray);
     } catch (err) {
-      setError('Failed to convert PDF. Please try again.');
-      console.error(err);
+      console.error("Compression failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to converting pdf into jpg. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

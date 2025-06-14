@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FaFilePdf, FaFilePowerpoint, FaDownload } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 const PdfToPptPage = () => {
   const [file, setFile] = useState(null);
@@ -33,9 +34,24 @@ const PdfToPptPage = () => {
     setError(null);
     const formData = new FormData();
     formData.append('pdf', file);
-
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
       console.log('Sending request to server...');
+         const trackRes = await axios.post('/api/user/track', {
+        service: 'pdf-to-ppt',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/pdf-to-ppt', {
         method: 'POST',
         body: formData,
@@ -49,9 +65,15 @@ const PdfToPptPage = () => {
       const blob = await response.blob();
       setConvertedFile(blob);
       toast.success('PDF converted to PPT successfully!');
-    } catch (error) {
-      console.error('Conversion error:', error);
-      setError(error.message || 'Failed to convert PDF file. Please make sure the server is running.');
+    } catch (err) {
+     console.error("Compression failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to pdf to pppt conversion. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

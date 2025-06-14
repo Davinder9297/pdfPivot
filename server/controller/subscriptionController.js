@@ -1,11 +1,49 @@
 const Plan = require('../models/Plan');
+const Subscription = require('../models/Subscription');
 const User = require('../models/User');
+const Stripe = require('stripe');
 
+const stripe = Stripe(process.env.STRIPE_API_KEY);
 // Create default plans if they don't exist
 const createDefaultPlans = async () => {
   try {
     const plans = await Plan.find();
     if (plans.length === 0) {
+      const servicesList = [
+        'merge-pdf',
+        'split-pdf',
+        'remove-pages',
+        'extract-pages',
+        'organize-pdf',
+        'rotate-pdf',
+        'compress-pdf',
+        'jpg-to-pdf',
+        'word-to-pdf',
+        'ppt-to-pdf',
+        'excel-to-pdf',
+        'html-to-pdf',
+        'pdf-to-jpg',
+        'pdf-to-word',
+        'pdf-to-ppt',
+        'pdf-to-excel',
+        'pdf-to-pdfa',
+        'view-metadata',
+        'add-page-numbers',
+        'add-watermark',
+        'unlock-pdf',
+        'protect-pdf',
+        'compare-pdf',
+        'pdf-to-text',
+        'update-metadata'
+      ];
+
+      const generateServiceQuotas = (monthly, annual) =>
+        servicesList.map(service => ({
+          name: service,
+          monthlyQuota: monthly,
+          annualQuota: annual
+        }));
+
       const defaultPlans = [
         {
           name: 'Basic',
@@ -14,20 +52,7 @@ const createDefaultPlans = async () => {
           maxImages: 10,
           maxFileSize: 5, // MB
           maxResolution: '1920x1080',
-          services: [
-            { name: 'optimize-compress', monthlyQuota: 3, annualQuota: 36 },
-            { name: 'optimize-upscale', monthlyQuota: 3, annualQuota: 36 },
-            { name: 'optimize-remove-background', monthlyQuota: 3, annualQuota: 36 },
-            { name: 'create-meme', monthlyQuota: 3, annualQuota: 36 },
-            { name: 'modify-resize', monthlyQuota: 3, annualQuota: 36 },
-            { name: 'modify-crop', monthlyQuota: 3, annualQuota: 36 },
-            { name: 'modify-rotate', monthlyQuota: 3, annualQuota: 36 },
-            { name: 'convert-to-jpg', monthlyQuota: 3, annualQuota: 36 },
-            { name: 'convert-from-jpg', monthlyQuota: 3, annualQuota: 36 },
-            { name: 'convert-html-to-image', monthlyQuota: 3, annualQuota: 36 },
-            { name: 'security-watermark', monthlyQuota: 3, annualQuota: 36 },
-            { name: 'security-blur-face', monthlyQuota: 3, annualQuota: 36 }
-          ]
+          services: generateServiceQuotas(3, 36)
         },
         {
           name: 'Developer',
@@ -36,20 +61,7 @@ const createDefaultPlans = async () => {
           maxImages: 100,
           maxFileSize: 10, // MB
           maxResolution: '2560x1440',
-          services: [
-            { name: 'optimize-compress', monthlyQuota: 10, annualQuota: 120 },
-            { name: 'optimize-upscale', monthlyQuota: 10, annualQuota: 120 },
-            { name: 'optimize-remove-background', monthlyQuota: 10, annualQuota: 120 },
-            { name: 'create-meme', monthlyQuota: 10, annualQuota: 120 },
-            { name: 'modify-resize', monthlyQuota: 10, annualQuota: 120 },
-            { name: 'modify-crop', monthlyQuota: 10, annualQuota: 120 },
-            { name: 'modify-rotate', monthlyQuota: 10, annualQuota: 120 },
-            { name: 'convert-to-jpg', monthlyQuota: 10, annualQuota: 120 },
-            { name: 'convert-from-jpg', monthlyQuota: 10, annualQuota: 120 },
-            { name: 'convert-html-to-image', monthlyQuota: 10, annualQuota: 120 },
-            { name: 'security-watermark', monthlyQuota: 10, annualQuota: 120 },
-            { name: 'security-blur-face', monthlyQuota: 10, annualQuota: 120 }
-          ]
+          services: generateServiceQuotas(10, 120)
         },
         {
           name: 'Business',
@@ -58,20 +70,7 @@ const createDefaultPlans = async () => {
           maxImages: -1, // unlimited
           maxFileSize: 20, // MB
           maxResolution: '3840x2160',
-          services: [
-            { name: 'optimize-compress', monthlyQuota: -1, annualQuota: -1 },
-            { name: 'optimize-upscale', monthlyQuota: -1, annualQuota: -1 },
-            { name: 'optimize-remove-background', monthlyQuota: -1, annualQuota: -1 },
-            { name: 'create-meme', monthlyQuota: -1, annualQuota: -1 },
-            { name: 'modify-resize', monthlyQuota: -1, annualQuota: -1 },
-            { name: 'modify-crop', monthlyQuota: -1, annualQuota: -1 },
-            { name: 'modify-rotate', monthlyQuota: -1, annualQuota: -1 },
-            { name: 'convert-to-jpg', monthlyQuota: -1, annualQuota: -1 },
-            { name: 'convert-from-jpg', monthlyQuota: -1, annualQuota: -1 },
-            { name: 'convert-html-to-image', monthlyQuota: -1, annualQuota: -1 },
-            { name: 'security-watermark', monthlyQuota: -1, annualQuota: -1 },
-            { name: 'security-blur-face', monthlyQuota: -1, annualQuota: -1 }
-          ]
+          services: generateServiceQuotas(-1, -1)
         }
       ];
 
@@ -83,9 +82,19 @@ const createDefaultPlans = async () => {
   }
 };
 
+
 // Call the function to create default plans
 createDefaultPlans();
-
+exports.getPlanById = async (req, res) => {
+  try {
+    const plan = await Plan.findById(req.params.id);
+    if (!plan) return res.status(404).json({ error: 'Plan not found' });
+    res.json(plan);
+  } catch (err) {
+    console.error('Error fetching plan:', err);
+    res.status(500).json({ error: 'Server error fetching plan' });
+  }
+};
 // Admin functions
 exports.createPlan = async (req, res) => {
   try {
@@ -271,4 +280,111 @@ exports.incrementUsage = async (req, res) => {
     console.error('Error incrementing usage:', err);
     res.status(500).json({ error: 'Failed to increment usage' });
   }
+};
+exports.createCheckoutSession = async (req, res) => {
+  const { planId, billingType } = req.body;
+
+  try {
+    const plan = await Plan.findById(planId);
+    const amount = billingType === 'monthly' ? plan.monthlyFee : plan.annualFee;
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          product_data: { name: `${plan.name} (${billingType})` },
+          unit_amount: amount * 100,
+        },
+        quantity: 1,
+      }],
+      metadata: {
+        planId,
+        billingType,
+        userId: req.user._id.toString() // assuming auth middleware
+      },
+      success_url: `${process.env.CLIENT_URL}/success`,
+      cancel_url: `${process.env.CLIENT_URL}/cancel`,
+    });
+
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Checkout session failed' });
+  }
+};
+
+exports.stripeWebhook = async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+
+  let event;
+
+  try {
+    event = Stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    console.error('❌ Webhook Error:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+console.log("event",event);
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+
+    const {
+      userId,
+      planId,
+      billingType
+    } = session.metadata || {};
+
+    try {
+      const plan = await Plan.findById(planId);
+      if (!plan) {
+        console.error('⚠️ Plan not found');
+        return res.status(404).send('Plan not found');
+      }
+
+      const durationInMs = billingType === 'annual'
+        ? 365 * 24 * 60 * 60 * 1000
+        : 30 * 24 * 60 * 60 * 1000;
+
+      const startDate = new Date();
+      const endDate = new Date(startDate.getTime() + durationInMs);
+
+      const subscription = new Subscription({
+        user: userId,
+        plan: planId,
+        billingType,
+        amountPaid: session.amount_total / 100, // Stripe uses cents
+        currency: session.currency,
+        chargeId: session.payment_intent,
+        paymentStatus: session.payment_status,
+        paymentMethod: session.payment_method_types?.[0] || 'unknown',
+        startDate,
+        endDate
+      });
+
+      await subscription.save();
+
+      // Update user document
+      await User.findByIdAndUpdate(userId, {
+        currentPlan: planId,
+        subscriptionType: billingType,
+        subscriptionStartDate: startDate,
+        subscriptionEndDate: endDate
+      });
+
+      console.log('✅ Subscription and user updated successfully');
+      return res.status(200).json({ received: true });
+    } catch (err) {
+      console.error('❌ Error saving subscription:', err);
+      return res.status(500).json({ error: 'Server error during webhook processing' });
+    }
+  }
+
+  res.status(200).json({ received: true });
 };

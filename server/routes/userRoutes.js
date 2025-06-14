@@ -43,40 +43,51 @@ router.post('/track', auth, async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-
+if (
+  user.subscriptionEndDate &&
+  new Date(user.subscriptionEndDate).getTime() < Date.now()
+) {
+  return res.status(403).json({ error: 'Your subscription plan has expired.' });
+}
     // Ensure plan is populated
     let plan = user.currentPlan;
     if (!plan) {
       // Create Basic plan if it doesn't exist
       plan = await Plan.findOne({ name: 'Basic' });
       if (!plan) {
-        plan = await Plan.create({
-          name: 'Basic',
-          monthlyFee: 0,
-          annualFee: 0,
-          services: [
-            {
-              name: 'convert-to-jpg',
-              monthlyQuota: 100,
-              annualQuota: 1000
-            },
-            {
-              name: 'convert-from-jpg',
-              monthlyQuota: 100,
-              annualQuota: 1000
-            },
-            {
-              name: 'modify-rotate',
-              monthlyQuota: 50,
-              annualQuota: 500
-            },
-            {
-              name: 'optimize-upscale',
-              monthlyQuota: 50,
-              annualQuota: 500
-            }
-          ]
-        });
+    plan = await Plan.create({
+  name: 'Basic',
+  monthlyFee: 0,
+  annualFee: 0,
+  services: [
+    { name: 'merge-pdf', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'split-pdf', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'remove-pages', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'extract-pages', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'organize-pdf', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'rotate-pdf', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'compress-pdf', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'jpg-to-pdf', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'word-to-pdf', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'ppt-to-pdf', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'excel-to-pdf', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'html-to-pdf', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'pdf-to-jpg', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'pdf-to-word', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'pdf-to-ppt', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'pdf-to-excel', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'pdf-to-pdfa', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'view-metadata', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'add-page-numbers', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'add-watermark', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'unlock-pdf', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'protect-pdf', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'compare-pdf', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'pdf-to-text', monthlyQuota: 3, annualQuota: 36 },
+    { name: 'update-metadata', monthlyQuota: 3, annualQuota: 36 }
+  ]
+});
+
       }
     }
 

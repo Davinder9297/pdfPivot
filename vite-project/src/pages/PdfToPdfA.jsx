@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FaFilePdf, FaDownload } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 const PdfToPdfaPage = () => {
   const [file, setFile] = useState(null);
@@ -32,8 +33,23 @@ const PdfToPdfaPage = () => {
 
     const formData = new FormData();
     formData.append('pdf', file);
-
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+         const trackRes = await axios.post('/api/user/track', {
+        service: 'pdf-to-pdfa',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/pdf-to-pdfa', {
         method: 'POST',
         body: formData,
@@ -48,8 +64,14 @@ const PdfToPdfaPage = () => {
       setConvertedFile(blob);
       toast.success('PDF converted to PDF/A successfully!');
     } catch (err) {
-      console.error('Conversion error:', err);
-      setError(err.message || 'Failed to convert PDF. Please check the server.');
+       console.error("Comparison failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to convert into pdfa. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

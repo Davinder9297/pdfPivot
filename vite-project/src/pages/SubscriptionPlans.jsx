@@ -1,44 +1,59 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import moment from 'moment';
+
+const PlanStatus = ({ currentPlan, userDetails }) => {
+  if (!currentPlan || !userDetails?.subscriptionEndDate) return null;
+
+  const isExpired = moment(userDetails.subscriptionEndDate).isBefore(moment());
+  const expiryText = isExpired ? 'expired on' : 'will expire on';
+  const colorClass = isExpired ? 'text-red-600' : 'text-green-400';
+
+  return (
+    <div className={`font-semibold text-lg ${colorClass}`}>
+      Your <span className="capitalize">{currentPlan?.name}</span> plan {expiryText} {moment(userDetails.subscriptionEndDate).local().format('MMMM Do YYYY, h:mm:ss A')}
+    </div>
+  );
+};
 
 const SubscriptionPlans = () => {
   const [plans, setPlans] = useState([]);
   const [currentPlan, setCurrentPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     let mounted = true;
-    
+
     const fetchPlans = async () => {
       try {
         setError(null);
-        // Get token from localStorage
         const token = localStorage.getItem('token');
-        
+
         if (!token) {
           setError('Please log in to view subscription details');
           setLoading(false);
           return;
         }
 
-        // Set auth header
         const config = {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         };
 
-        // Fetch plans first
         const { data: plansData } = await axios.get('/api/subscriptions/plans', config);
         if (!mounted) return;
         setPlans(plansData);
 
-        // Then fetch subscription status
         try {
           const { data: subscriptionData } = await axios.get('/api/payments/subscription-status', config);
           if (!mounted) return;
-          setCurrentPlan(subscriptionData.subscription?.plan);
+          setCurrentPlan(subscriptionData.subscription?.planDetails);
+          setUserDetails(subscriptionData.subscription?.userDetails);
         } catch (subErr) {
           console.error('Error fetching subscription:', subErr);
           if (subErr.response?.status === 401) {
@@ -63,45 +78,13 @@ const SubscriptionPlans = () => {
     };
 
     fetchPlans();
-
     return () => {
       mounted = false;
     };
   }, []);
 
-  const handleSubscribe = async (planId) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Please log in to subscribe to a plan');
-        return;
-      }
-
-      const config = {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      };
-
-      const response = await axios.post('/api/subscriptions/subscribe', {
-        planId,
-        subscriptionType: 'monthly'
-      }, config);
-      
-      if (response.data?.user?.currentPlan) {
-        setCurrentPlan(response.data.user.currentPlan);
-      }
-      
-      // Redirect to checkout or show success message
-      window.location.href = `/checkout?plan=${planId}`;
-    } catch (err) {
-      console.error('Error subscribing to plan:', err);
-      if (err.response?.status === 401) {
-        alert('Your session has expired. Please log in again.');
-      } else {
-        alert('Failed to subscribe to plan. Please try again.');
-      }
-    }
+  const handleSubscribe = (planId) => {
+    navigate('/subscribe?planId=' + planId);
   };
 
   const handleCancelSubscription = async () => {
@@ -121,7 +104,8 @@ const SubscriptionPlans = () => {
 
         await axios.post('/api/subscriptions/cancel', {}, config);
         const { data } = await axios.get('/api/payments/subscription-status', config);
-        setCurrentPlan(data.subscription?.plan);
+        setCurrentPlan(data.subscription?.planDetails);
+        setUserDetails(data.subscription?.userDetails);
       } catch (err) {
         console.error('Error canceling subscription:', err);
         if (err.response?.status === 401) {
@@ -168,12 +152,15 @@ const SubscriptionPlans = () => {
 
   return (
     <div className="p-8 max-w-[1400px] mx-auto ">
+      {currentPlan && <PlanStatus currentPlan={currentPlan} userDetails={userDetails} />}
+
       <h1 className="text-2xl font-bold mb-8">Available Plans</h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {plans.map((plan) => (
+          plan?.name !== 'admin' &&
           <div key={plan._id} className="bg-[#008080] text-green-400 p-8 rounded-lg shadow-md relative min-h-[600px] flex flex-col">
-            {currentPlan === plan.name && (
+            {currentPlan?._id === plan._id && (
               <div className="absolute -top-3 -right-3 bg-indigo-500 text-white px-3 py-1 rounded-full text-sm">
                 Current Plan
               </div>
@@ -183,7 +170,7 @@ const SubscriptionPlans = () => {
               <p className="text-white mb-6">
                 {plan.monthlyFee === 0 ? "Free" : `$${plan.monthlyFee}/month`}
               </p>
-              
+
               {plan.services.map((service, index) => (
                 <div key={index} className="flex items-start mb-3">
                   <svg className="w-4 h-4 text-green-400 mr-2 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,7 +183,7 @@ const SubscriptionPlans = () => {
               ))}
             </div>
 
-            {currentPlan !== plan.name && (
+            {currentPlan?._id !== plan._id && (
               <div className="mt-auto pt-6">
                 <button
                   onClick={() => handleSubscribe(plan._id)}
@@ -224,4 +211,4 @@ const SubscriptionPlans = () => {
   );
 };
 
-export default SubscriptionPlans; 
+export default SubscriptionPlans;

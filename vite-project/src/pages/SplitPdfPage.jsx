@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useState } from "react";
 
 const SplitPdfPage = () => {
@@ -23,7 +24,23 @@ const SplitPdfPage = () => {
     setZipUrl(null);
     const formData = new FormData();
     formData.append('pdf', file);
+       const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+            const trackRes = await axios.post('/api/user/track', {
+        service: 'split-pdf',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/split-pdf', {
         method: 'POST',
         body: formData,
@@ -33,7 +50,14 @@ const SplitPdfPage = () => {
       const url = window.URL.createObjectURL(blob);
       setZipUrl(url);
     } catch (err) {
-      setError('Failed to split PDF. Please try again.');
+        console.error("Comparison failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to split pdf. Please try again.");
+      }
     }
     setLoading(false);
   };

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FaLock, FaUnlock } from 'react-icons/fa';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 const UnlockPdfPage = () => {
   const [file, setFile] = useState(null);
@@ -46,8 +47,23 @@ const UnlockPdfPage = () => {
     const formData = new FormData();
     formData.append('pdf', file);
     formData.append('password', password);
-
+   const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+            const trackRes = await axios.post('/api/user/track', {
+        service: 'unlock-pdf',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/unlock-pdf', {
         method: 'POST',
         body: formData
@@ -74,9 +90,15 @@ const UnlockPdfPage = () => {
       toast.success('PDF unlocked successfully!');
       setFile(null);
       setPassword('');
-    } catch (error) {
-      setError(error.message);
-      toast.error(error.message);
+    } catch (err) {
+        console.error("Comparison failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to unlock pdf. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

@@ -42,7 +42,7 @@ const ConvertPage = () => {
 
       // Track usage first
       const trackRes = await axios.post("/api/user/track", {
-        service: format === 'jpg' ? 'convert-to-jpg' : 'convert-from-jpg',
+        service: format === 'jpg' ? 'jpg-to-pdf' : 'pdf-to-jpg',
         imageCount: 1
       }, {
         headers: {

@@ -35,8 +35,23 @@ const WordToPdfPage = () => {
     setError(null);
     const formData = new FormData();
     formData.append('document', file);
-
+   const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+            const trackRes = await axios.post('/api/user/track', {
+        service: 'word-to-pdf',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       console.log('Sending request to server...');
       const response = await axios.post('/api/word-to-pdf', formData, {
         responseType: 'blob',  // Important to get file blob
@@ -47,10 +62,15 @@ const WordToPdfPage = () => {
 
       setConvertedFile(response.data);
       toast.success('Document converted to PDF successfully!');
-    } catch (error) {
-      console.error('Conversion error:', error);
-      const message = error.response?.data?.error || error.message || 'Failed to convert document. Please make sure the server is running.';
-      setError(message);
+    } catch (err) {
+       console.error("Comparison failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to word to pdf conversion. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

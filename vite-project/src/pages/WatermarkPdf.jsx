@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FaFilePdf, FaDownload } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 const PdfWatermarkPage = () => {
   const [file, setFile] = useState(null);
@@ -40,8 +41,23 @@ const PdfWatermarkPage = () => {
     const formData = new FormData();
     formData.append('pdf', file);
     formData.append('watermark', watermarkText);
-
+   const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+            const trackRes = await axios.post('/api/user/track', {
+        service: 'add-watermark',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/pdf-watermark', {
         method: 'POST',
         body: formData,
@@ -56,8 +72,14 @@ const PdfWatermarkPage = () => {
       setWatermarkedFile(blob);
       toast.success('Watermark added successfully!');
     } catch (err) {
-      console.error('Watermark error:', err);
-      setError(err.message || 'Failed to add watermark. Please check the server.');
+        console.error("Comparison failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to adding watermark pdf. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

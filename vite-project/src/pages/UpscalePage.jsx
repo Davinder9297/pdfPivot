@@ -85,16 +85,6 @@ const UpscalePage = () => {
         return;
       }
 
-      await axios.post('/api/user/track', {
-        service: 'optimize-upscale',
-        imageCount: 1
-      }, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
       const link = document.createElement("a");
       link.download = "upscaled-image.png";
       link.href = image;

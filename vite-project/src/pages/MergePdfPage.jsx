@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useState } from "react";
 
 const MergePdfPage = () => {
@@ -46,8 +47,23 @@ const MergePdfPage = () => {
 
     const formData = new FormData();
     files.forEach(file => formData.append('pdfs', file));
-
+        const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+         const trackRes = await axios.post('/api/user/track', {
+        service: 'merge-pdf',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/merge-pdf', {
         method: 'POST',
         body: formData,
@@ -57,7 +73,14 @@ const MergePdfPage = () => {
       const url = window.URL.createObjectURL(blob);
       setMergedPdfUrl(url);
     } catch (err) {
-      setError('Failed to merge PDFs. Please try again.');
+     console.error("Compression failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to merge pdf. Please try again.");
+      }
     }
     setLoading(false);
   };

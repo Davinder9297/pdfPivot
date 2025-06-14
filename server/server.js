@@ -18,6 +18,7 @@ const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const pdfRoutes = require('./routes/pdf');
+app.use('/api/subscriptions/webhook', express.raw({ type: 'application/json' }));
 
 app.use(cors());
 app.use(express.json({ limit: process.env.MAX_FILE_SIZE }));

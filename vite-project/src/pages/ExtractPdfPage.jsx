@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { PDFDocument } from 'pdf-lib';
+import axios from "axios";
 
 const ExtractPdfPage = () => {
   const [file, setFile] = useState(null);
@@ -43,8 +44,23 @@ const ExtractPdfPage = () => {
     setLoading(true);
     setError(null);
     setPdfUrl(null);
-
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+         const trackRes = await axios.post('/api/user/track', {
+        service: 'extract-pages',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       // Validate page numbers input
       const pages = pageNumbers.split(',').map(p => p.trim()).filter(p => p);
       if (pages.length === 0) {
@@ -80,10 +96,18 @@ const ExtractPdfPage = () => {
       const url = window.URL.createObjectURL(blob);
       setPdfUrl(url);
     } catch (err) {
-      console.error('Error:', err);
-      setError('Failed to extract pages. Please try again.');
+        console.error("Extract failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to extract pdf. Please try again.");
+      }
     }
-    setLoading(false);
+    finally{
+      setLoading(false);
+    }
   };
 
   return (

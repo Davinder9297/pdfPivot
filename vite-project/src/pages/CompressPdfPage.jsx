@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FaFilePdf, FaCompress, FaDownload } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 const CompressPdfPage = () => {
   const [file, setFile] = useState(null);
@@ -35,8 +36,23 @@ const CompressPdfPage = () => {
     const formData = new FormData();
     formData.append('pdf', file);
     formData.append('compressionLevel', compressionLevel);
-
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+         const trackRes = await axios.post('/api/user/track', {
+        service: 'compress-pdf',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       console.log('Sending request to server...');
       const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL+'/api/pdf/compress', {
         method: 'POST',
@@ -51,9 +67,15 @@ const CompressPdfPage = () => {
       const blob = await response.blob();
       setCompressedFile(blob);
       toast.success('PDF compressed successfully!');
-    } catch (error) {
-      console.error('Compression error:', error);
-      setError(error.message || 'Failed to compress PDF. Please make sure the server is running.');
+    } catch (err) {
+        console.error("Compression failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to compress pdf. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

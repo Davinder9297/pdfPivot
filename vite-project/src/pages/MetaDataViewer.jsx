@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FaFilePdf } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 const PdfMetadataViewer = () => {
   const [file, setFile] = useState(null);
@@ -32,8 +33,23 @@ const PdfMetadataViewer = () => {
 
     const formData = new FormData();
     formData.append('pdf', file);
-
+        const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+         const trackRes = await axios.post('/api/user/track', {
+        service: 'view-metadata',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL + '/api/view-metadata', {
         method: 'POST',
         body: formData,
@@ -47,9 +63,15 @@ const PdfMetadataViewer = () => {
       const data = await response.json();
       setMetadata(data.metadata);
       toast.success('Metadata retrieved successfully!');
-    } catch (error) {
-      console.error('Metadata error:', error);
-      setError(error.message || 'Failed to retrieve metadata.');
+    } catch (err) {
+       console.error("Comparison failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to view metadata pdf. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

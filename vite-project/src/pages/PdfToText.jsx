@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FaFilePdf, FaDownload } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 const PdfToTextPage = () => {
   const [file, setFile] = useState(null);
@@ -32,8 +33,23 @@ const PdfToTextPage = () => {
 
     const formData = new FormData();
     formData.append('pdf', file);
-
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+         const trackRes = await axios.post('/api/user/track', {
+        service: 'pdf-to-text',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       const response = await fetch(`${import.meta.env.VITE_BACKEND_BASE_URL}/api/pdf-to-text`, {
         method: 'POST',
         body: formData,
@@ -47,8 +63,15 @@ const PdfToTextPage = () => {
       const blob = await response.blob();
       setConvertedFile(blob);
       toast.success('PDF converted to plain text successfully!');
-    } catch (error) {
-      setError(error.message || 'Failed to convert PDF.');
+    } catch (err) {
+    console.error("Compression failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to pdf to text conversion. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

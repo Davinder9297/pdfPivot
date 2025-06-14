@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FaFilePdf, FaDownload, FaEdit } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 const UpdateMetadataPage = () => {
   const [file, setFile] = useState(null);
@@ -42,8 +43,23 @@ const UpdateMetadataPage = () => {
     formData.append('author', metadata.author);
     formData.append('subject', metadata.subject);
     formData.append('keywords', metadata.keywords);
-
+   const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+            const trackRes = await axios.post('/api/user/track', {
+        service: 'update-metadata',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       const response = await fetch(import.meta.env.VITE_BACKEND_BASE_URL + '/api/update-metadata', {
         method: 'POST',
         body: formData,
@@ -57,9 +73,15 @@ const UpdateMetadataPage = () => {
       const blob = await response.blob();
       setUpdatedFile(blob);
       toast.success('Metadata updated successfully!');
-    } catch (error) {
-      console.error('Update error:', error);
-      setError(error.message || 'Failed to update metadata.');
+    } catch (err) {
+        console.error("Comparison failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to update metadata of pdf. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

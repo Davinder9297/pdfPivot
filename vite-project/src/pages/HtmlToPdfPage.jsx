@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 
@@ -12,7 +13,22 @@ const HtmlToPdfPage = () => {
       return;
     }
     setLoading(true);
+        const token = localStorage.getItem('token');
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     try {
+         const trackRes = await axios.post('/api/user/track', {
+        service: 'html-to-pdf',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       const response = await fetch("/api/html-to-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

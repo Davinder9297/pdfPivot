@@ -61,7 +61,7 @@ const Dashboard = () => {
                       </div>
                       <div className="ml-5 w-0 flex-1">
                         <dl>
-                          <dt className="text-sm font-medium text-gray-500 truncate">Images Processed</dt>
+                          <dt className="text-sm font-medium text-gray-500 truncate">Pdf Processed</dt>
                           <dd className="text-lg font-medium text-teal-600">{userStats.imagesProcessed}</dd>
                         </dl>
                       </div>
@@ -79,7 +79,7 @@ const Dashboard = () => {
                       </div>
                       <div className="ml-5 w-0 flex-1">
                         <dl>
-                          <dt className="text-sm font-medium text-gray-500 truncate">Remaining Images</dt>
+                          <dt className="text-sm font-medium text-gray-500 truncate">Remaining pdf</dt>
                           <dd className="text-lg font-medium text-teal-600">{userStats.remainingImages}</dd>
                         </dl>
                       </div>
@@ -110,22 +110,22 @@ const Dashboard = () => {
 
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 <Link
-                  to="/convert"
+                  to="/"
                   className="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-300"
                 >
                   <div className="p-5">
-                    <h3 className="text-lg font-medium text-teal-600">Convert Images</h3>
-                    <p className="mt-1 text-sm text-gray-500">Convert images between different formats</p>
+                    <h3 className="text-lg font-medium text-teal-600">Convert Pdf</h3>
+                    <p className="mt-1 text-sm text-gray-500">Convert pdf between different formats</p>
                   </div>
                 </Link>
 
                 <Link
-                  to="/compress"
+                  to="/"
                   className="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-300"
                 >
                   <div className="p-5">
                     <h3 className="text-lg font-medium text-teal-600">Compress Images</h3>
-                    <p className="mt-1 text-sm text-gray-500">Reduce image file size while maintaining quality</p>
+                    <p className="mt-1 text-sm text-gray-500">Reduce pdf file size while maintaining quality</p>
                   </div>
                 </Link>
 

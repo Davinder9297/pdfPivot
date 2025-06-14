@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 
@@ -66,7 +67,23 @@ const OrganizePdfPage = () => {
     setLoading(true);
     setError(null);
     setPdfUrl(null);
+        const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Please login to use this feature");
+      setLoading(false);
+      return;
+    }
     try {
+         const trackRes = await axios.post('/api/user/track', {
+        service: 'organize-pdf',
+        imageCount: 1
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       const { PDFDocument } = await import('pdf-lib');
       const arrayBuffer = await file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(arrayBuffer);
@@ -80,8 +97,14 @@ const OrganizePdfPage = () => {
       setPdfUrl(url);
       toast.success('PDF reordered!');
     } catch (err) {
-      setError('Failed to reorder PDF: ' + err.message);
-      toast.error('Failed to reorder PDF: ' + err.message);
+     console.error("Compression failed:", err);
+      if (err.response?.status === 401) {
+        setError("Please login to use this feature");
+      } else if (err.response?.status === 403) {
+        setError("You have reached your pdf processing limit. Please upgrade your plan.");
+      } else {
+        setError("Failed to organize pdf. Please try again.");
+      }
     }
     setLoading(false);
   };

@@ -41,6 +41,9 @@ import PdfRedactionPage from "./pages/PdfRedactionPage";
 import PdfToTextPage from "./pages/PdfToText";
 import UpdateMetadataPage from "./pages/UpdateMetaData";
 import PdfMetadataViewer from "./pages/MetaDataViewer";
+import PaymentFailedPage from "./pages/PaymentFailed";
+import PaymentSuccessPage from "./pages/PaymentSuccess";
+import SubscribePage from "./pages/SubscribePage";
 
 function App() {
   return (
@@ -55,6 +58,9 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/signup" element={<Register />} />
               <Route path="/plans" element={<SubscriptionPlans />} />
+                  <Route path="/subscribe" element={<SubscribePage />} />
+              <Route path="/success" element={<PaymentSuccessPage />} />
+              <Route path="/cancel" element={<PaymentFailedPage />}/>
               
               {/* Protected Routes */}
               <Route path="/dashboard" element={

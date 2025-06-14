@@ -151,7 +151,7 @@ const WatermarkPage = () => {
         }
 
         await axios.post('/api/user/track', {
-          service: 'security-watermark',
+          service: 'add-watermark',
           imageCount: 1
         }, {
           headers: {
