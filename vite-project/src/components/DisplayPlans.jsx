@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SubscriptionPlans from '../pages/SubscriptionPlans';
 
 const DisplayPlans = () => {
   const plans = [
@@ -29,15 +30,15 @@ const DisplayPlans = () => {
   ];
 
   return (
-    <div id="pricing" className="px-6 py-12 bg-[#525266] border-t-4 border-forest">
+    <div id="pricing" className="px-6 py-12 bg-[#000000] border-t-4 border-forest">
       <h2 className="text-2xl md:text-3xl font-bold text-center text-green-400 mb-4">
         Subscription Plans
       </h2>
       <p className="text-center text-white mb-10">
         Choose a plan that fits your needs. Upgrade anytime.
       </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
+      <SubscriptionPlans/>
+      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
         {plans.map((plan, index) => (
           <div
             key={index}
@@ -66,7 +67,7 @@ const DisplayPlans = () => {
             </ul>
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 };

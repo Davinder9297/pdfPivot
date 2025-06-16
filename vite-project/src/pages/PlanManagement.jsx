@@ -2,18 +2,31 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const AVAILABLE_SERVICES = [
-  'optimize-compress',
-  'optimize-upscale',
-  'optimize-remove-background',
-  'create-meme',
-  'modify-resize',
-  'modify-crop',
-  'modify-rotate',
-  'convert-to-jpg',
-  'convert-from-jpg',
-  'convert-html-to-image',
-  'security-watermark',
-  'security-blur-face'
+   'merge-pdf',
+  'split-pdf',
+  'remove-pages',
+  'extract-pages',
+  'organize-pdf',
+  'rotate-pdf',
+  'compress-pdf',
+  'jpg-to-pdf',
+  'word-to-pdf',
+  'ppt-to-pdf',
+  'excel-to-pdf',
+  'html-to-pdf',
+  'pdf-to-jpg',
+  'pdf-to-word',
+  'pdf-to-ppt',
+  'pdf-to-excel',
+  'pdf-to-pdfa',
+  'view-metadata',
+  'add-page-numbers',
+  'add-watermark',
+  'unlock-pdf',
+  'protect-pdf',
+  'compare-pdf',
+  'pdf-to-text',
+  'update-metadata'
 ];
 
 const PlanManagement = () => {

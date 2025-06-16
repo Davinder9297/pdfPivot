@@ -25,29 +25,25 @@ const SubscriptionPlans = () => {
   const [userDetails, setUserDetails] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    let mounted = true;
+ useEffect(() => {
+  let mounted = true;
 
-    const fetchPlans = async () => {
-      try {
-        setError(null);
-        const token = localStorage.getItem('token');
+  const fetchPlans = async () => {
+    try {
+      setError(null);
+      const token = localStorage.getItem('token');
 
-        if (!token) {
-          setError('Please log in to view subscription details');
-          setLoading(false);
-          return;
-        }
+      const { data: plansData } = await axios.get('/api/subscriptions/plans');
+      if (!mounted) return;
+      setPlans(plansData);
 
+      // If user is logged in, fetch subscription status
+      if (token) {
         const config = {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         };
-
-        const { data: plansData } = await axios.get('/api/subscriptions/plans', config);
-        if (!mounted) return;
-        setPlans(plansData);
 
         try {
           const { data: subscriptionData } = await axios.get('/api/payments/subscription-status', config);
@@ -56,66 +52,45 @@ const SubscriptionPlans = () => {
           setUserDetails(subscriptionData.subscription?.userDetails);
         } catch (subErr) {
           console.error('Error fetching subscription:', subErr);
+          // Optional: You can show a different message or skip this entirely
           if (subErr.response?.status === 401) {
             setError('Your session has expired. Please log in again.');
           }
         }
-      } catch (err) {
-        console.error('Error fetching plans:', err);
-        if (!mounted) return;
-        if (err.response?.status === 404) {
-          setError('The subscription service is currently unavailable. Please try again later.');
-        } else if (err.response?.status === 401) {
-          setError('Please log in to view subscription details');
-        } else {
-          setError('Failed to load subscription plans. Please try again later.');
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
       }
-    };
 
-    fetchPlans();
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const handleSubscribe = (planId) => {
-    navigate('/subscribe?planId=' + planId);
-  };
-
-  const handleCancelSubscription = async () => {
-    if (window.confirm('Are you sure you want to cancel your subscription?')) {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          alert('Please log in to cancel your subscription');
-          return;
-        }
-
-        const config = {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        };
-
-        await axios.post('/api/subscriptions/cancel', {}, config);
-        const { data } = await axios.get('/api/payments/subscription-status', config);
-        setCurrentPlan(data.subscription?.planDetails);
-        setUserDetails(data.subscription?.userDetails);
-      } catch (err) {
-        console.error('Error canceling subscription:', err);
-        if (err.response?.status === 401) {
-          alert('Your session has expired. Please log in again.');
-        } else {
-          alert('Failed to cancel subscription. Please try again.');
-        }
+    } catch (err) {
+      console.error('Error fetching plans:', err);
+      if (!mounted) return;
+      if (err.response?.status === 404) {
+        setError('The subscription service is currently unavailable. Please try again later.');
+      } else {
+        setError('Failed to load subscription plans. Please try again later.');
+      }
+    } finally {
+      if (mounted) {
+        setLoading(false);
       }
     }
   };
+
+  fetchPlans();
+  return () => {
+    mounted = false;
+  };
+}, []);
+
+
+const handleSubscribe = (planId) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    // Not logged in, redirect to login
+    navigate('/login');
+  } else {
+    // Logged in, proceed to subscription
+    navigate('/subscribe?planId=' + planId);
+  }
+};
 
   if (loading) {
     return (
@@ -154,7 +129,7 @@ const SubscriptionPlans = () => {
     <div className="p-8 max-w-[1400px] mx-auto ">
       {currentPlan && <PlanStatus currentPlan={currentPlan} userDetails={userDetails} />}
 
-      <h1 className="text-2xl font-bold mb-8">Available Plans</h1>
+      {/* <h1 className="text-2xl font-bold mb-8">Available Plans</h1> */}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {plans.map((plan) => (
