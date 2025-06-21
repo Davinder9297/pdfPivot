@@ -400,13 +400,14 @@ console.log("event",event);
         console.error('Failed to fetch PaymentIntent metadata:', err);
       }
     }
-
+    console.log("metadata",metadata);
+    
     const userId = metadata.userId;
     const planId = metadata.planId;
     const billingType = metadata.billingType;
 
     if (!userId || !planId || !billingType) {
-     res.status(400).json({ error: 'Missing metadata (userId, planId, billingType)' });
+     return res.status(400).json({ error: 'Missing metadata (userId, planId, billingType)' });
     }
 
     const startDate = new Date();
@@ -441,6 +442,7 @@ console.log("event",event);
         endDate
       }
     };
+console.log("paymentData",paymentData);
 
     try {
       await Payment.create(paymentData);
