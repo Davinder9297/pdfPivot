@@ -1,4 +1,5 @@
 const Plan = require('../models/Plan');
+const Payment = require('../models/Payment');
 const Subscription = require('../models/Subscription');
 const User = require('../models/User');
 const Stripe = require('stripe');
@@ -385,6 +386,64 @@ console.log("event",event);
       return res.status(500).json({ error: 'Server error during webhook processing' });
     }
   }
+   if (event.type === 'charge.succeeded') {
+    const charge = event.data.object;
 
+    const metadata = charge.metadata || {};
+    const userId = metadata.userId;
+    const planId = metadata.planId;
+    const billingType = metadata.billingType; // "monthly" or "annual"
+
+    if (!userId || !planId || !billingType) {
+      console.warn('⚠️ Missing metadata in Stripe charge');
+      return res.status(400).send('Missing required metadata.');
+    }
+
+    // Calculate billing cycle dates using plain JavaScript
+    const startDate = new Date();
+    const endDate = new Date(startDate.getTime());
+
+    if (billingType === 'annual') {
+      endDate.setFullYear(endDate.getFullYear() + 1);
+    } else {
+      endDate.setMonth(endDate.getMonth() + 1);
+    }
+
+    const paymentData = {
+      chargeId: charge.id,
+      amount: charge.amount,
+      currency: charge.currency,
+      billingDetails: {
+        name: charge.billing_details.name,
+        email: charge.billing_details.email,
+        country: charge.billing_details.address?.country || null
+      },
+      paymentMethod: {
+        brand: charge.payment_method_details.card?.brand,
+        last4: charge.payment_method_details.card?.last4,
+        expMonth: charge.payment_method_details.card?.exp_month,
+        expYear: charge.payment_method_details.card?.exp_year,
+        funding: charge.payment_method_details.card?.funding,
+        country: charge.payment_method_details.card?.country
+      },
+      receiptUrl: charge.receipt_url,
+      status: charge.status,
+
+      userId,
+      planId,
+      billingType,
+      billingCycle: {
+        startDate,
+        endDate
+      }
+    };
+
+    try {
+      await Payment.create(paymentData);
+      console.log('✅ Payment with billing cycle recorded successfully');
+    } catch (error) {
+      console.error('❌ Error saving payment:', error);
+    }
+  }
   res.status(200).json({ received: true });
 };

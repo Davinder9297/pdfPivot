@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const Plan = require('../models/Plan');
+const Payment = require('../models/Payment');
 
 // @desc    Get subscription status
 // @route   GET /api/payments/subscription-status
@@ -44,8 +45,28 @@ const cancelSubscription = asyncHandler(async (req, res) => {
         subscription: user.subscription
     });
 });
+ const getUserPayments = async (req, res) => {
+  const userId = req?.user?._id;
 
+  if (!userId) {
+     res.status(400).json({ error: 'User ID is required.' });
+  }
+
+  try {
+    const payments = await Payment.find({ userId }).sort({ createdAt: -1 }).populate('planId');
+
+    res.json({
+      success: true,
+      count: payments?.length,
+      payments
+    });
+  } catch (error) {
+    console.error('❌ Error fetching payments:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 module.exports = {
     getSubscriptionStatus,
-    cancelSubscription
+    cancelSubscription,
+    getUserPayments
 }; 

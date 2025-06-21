@@ -45,6 +45,7 @@ import PaymentFailedPage from "./pages/PaymentFailed";
 import PaymentSuccessPage from "./pages/PaymentSuccess";
 import SubscribePage from "./pages/SubscribePage";
 import OperationTabsWrapper from "./components/TabWrapper";
+import PaymentHistoryPage from "./pages/UserPaymentHistory";
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
                   <Route path="/subscribe" element={<SubscribePage />} />
               <Route path="/success" element={<PaymentSuccessPage />} />
               <Route path="/cancel" element={<PaymentFailedPage />}/>
+              <Route path="/payment-history" element={<PaymentHistoryPage />}/>
               
               {/* Protected Routes */}
               <Route path="/dashboard" element={
