@@ -388,26 +388,31 @@ console.log("event",event);
   }
    if (event.type === 'charge.succeeded') {
     const charge = event.data.object;
+    console.log("charge",charge);
+    
 
-    const metadata = charge.metadata || {};
+       let metadata = {};
+    if (charge.payment_intent) {
+      try {
+        const paymentIntent = await stripe.paymentIntents.retrieve(charge.payment_intent);
+        metadata = paymentIntent.metadata || {};
+      } catch (err) {
+        console.error('Failed to fetch PaymentIntent metadata:', err);
+      }
+    }
+
     const userId = metadata.userId;
     const planId = metadata.planId;
-    const billingType = metadata.billingType; // "monthly" or "annual"
+    const billingType = metadata.billingType;
 
     if (!userId || !planId || !billingType) {
-      console.warn('⚠️ Missing metadata in Stripe charge');
-      return res.status(400).send('Missing required metadata.');
+     res.status(400).json({ error: 'Missing metadata (userId, planId, billingType)' });
     }
 
-    // Calculate billing cycle dates using plain JavaScript
     const startDate = new Date();
-    const endDate = new Date(startDate.getTime());
-
-    if (billingType === 'annual') {
-      endDate.setFullYear(endDate.getFullYear() + 1);
-    } else {
-      endDate.setMonth(endDate.getMonth() + 1);
-    }
+    const endDate = new Date(startDate);
+    endDate.setFullYear(endDate.getFullYear() + (billingType === 'annual' ? 1 : 0));
+    endDate.setMonth(endDate.getMonth() + (billingType === 'monthly' ? 1 : 0));
 
     const paymentData = {
       chargeId: charge.id,
@@ -428,7 +433,6 @@ console.log("event",event);
       },
       receiptUrl: charge.receipt_url,
       status: charge.status,
-
       userId,
       planId,
       billingType,
@@ -440,7 +444,7 @@ console.log("event",event);
 
     try {
       await Payment.create(paymentData);
-      console.log('✅ Payment with billing cycle recorded successfully');
+      console.log('✅ Payment saved');
     } catch (error) {
       console.error('❌ Error saving payment:', error);
     }
