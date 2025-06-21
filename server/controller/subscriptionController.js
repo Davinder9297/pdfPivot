@@ -289,26 +289,32 @@ exports.createCheckoutSession = async (req, res) => {
     const plan = await Plan.findById(planId);
     const amount = billingType === 'monthly' ? plan.monthlyFee : plan.annualFee;
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'payment',
-      line_items: [{
-        price_data: {
-          currency: 'usd',
-          product_data: { name: `${plan.name} (${billingType})` },
-          unit_amount: amount * 100,
-        },
-        quantity: 1,
-      }],
-      metadata: {
-        planId,
-        billingType,
-        userId: req.user._id.toString() // assuming auth middleware
-      },
-      success_url: `${process.env.CLIENT_URL}/success`,
-      cancel_url: `${process.env.CLIENT_URL}/cancel`,
-    });
-
+   const session = await stripe.checkout.sessions.create({
+  payment_method_types: ['card'],
+  mode: 'payment',
+  line_items: [{
+    price_data: {
+      currency: 'usd',
+      product_data: { name: `${plan.name} (${billingType})` },
+      unit_amount: amount * 100,
+    },
+    quantity: 1,
+  }],
+  metadata: {
+    planId,
+    billingType,
+    userId: req.user._id.toString() // used in checkout.session.completed
+  },
+  payment_intent_data: {
+    metadata: {
+      planId,
+      billingType,
+      userId: req.user._id.toString() // used in charge.succeeded, etc.
+    }
+  },
+  success_url: `${process.env.CLIENT_URL}/success`,
+  cancel_url: `${process.env.CLIENT_URL}/cancel`,
+});
     res.json({ url: session.url });
   } catch (err) {
     console.error(err);
